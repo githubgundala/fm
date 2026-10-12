@@ -16,10 +16,13 @@ use Illuminate\Support\Facades\Cache;
  * @property string|null $logo_path
  * @property string|null $signature_path
  * @property string|null $signature_name
+ * @property string|null $slip_receiver_name
  * @property string $invoice_prefix
  * @property string $payment_prefix
+ * @property string $quotation_prefix
  * @property bool $yearly_reset
  * @property int $default_due_days
+ * @property int $default_quotation_validity_days
  * @property float|null $default_tax_rate
  * @property string|null $default_terms
  * @property string|null $default_notes
@@ -29,7 +32,7 @@ use Illuminate\Support\Facades\Cache;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['company_name', 'company_address', 'company_phone', 'company_email', 'logo_path', 'signature_path', 'signature_name', 'invoice_prefix', 'payment_prefix', 'yearly_reset', 'default_due_days', 'default_tax_rate', 'default_terms', 'default_notes', 'email_subject_template', 'email_body_template', 'allow_overpayment'])]
+#[Fillable(['company_name', 'company_address', 'company_phone', 'company_email', 'logo_path', 'signature_path', 'signature_name', 'slip_receiver_name', 'invoice_prefix', 'payment_prefix', 'quotation_prefix', 'yearly_reset', 'default_due_days', 'default_quotation_validity_days', 'default_tax_rate', 'default_terms', 'default_notes', 'email_subject_template', 'email_body_template', 'allow_overpayment'])]
 class InvoiceSetting extends Model
 {
     public const CACHE_KEY = 'invoice_settings';

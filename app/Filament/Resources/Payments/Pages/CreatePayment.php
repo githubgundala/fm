@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Payments\Pages;
 
+use App\Enums\PaymentMethod;
 use App\Filament\Resources\Payments\PaymentResource;
 use App\Models\Invoice;
 use App\Models\Payment;
@@ -30,7 +31,7 @@ class CreatePayment extends CreateRecord
         $payment = app(PaymentRecorder::class)->record(
             $invoice,
             is_numeric($amount) ? $amount : 0,
-            is_string($method) ? $method : '',
+            $method instanceof PaymentMethod || is_string($method) ? $method : '',
             is_string($paymentDate) ? $paymentDate : null,
             is_string($reference) ? $reference : null,
             is_string($notes) ? $notes : null,

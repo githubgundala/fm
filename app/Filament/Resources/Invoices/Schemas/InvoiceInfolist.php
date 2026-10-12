@@ -50,7 +50,8 @@ class InvoiceInfolist
                             ])
                             ->schema([
                                 TextEntry::make('description'),
-                                TextEntry::make('qty'),
+                                TextEntry::make('qty')
+                                    ->formatStateUsing(fn ($state): string => rtrim(rtrim(number_format((float) $state, 2), '0'), '.')),
                                 TextEntry::make('unit_price')
                                     ->money('IDR'),
                                 TextEntry::make('line_total')

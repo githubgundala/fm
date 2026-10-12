@@ -76,8 +76,8 @@
         <div>
             <p>{{ $settings->company_name }}, {{ $payment->payment_date->format('d M Y') }}</p>
             <p>Diterima oleh,</p>
-            <br><br>
-            <p>( .......................... )</p>
+            @if($signatureUrl ?? null)<img src="{{ $signatureUrl }}" alt="Tanda tangan" style="height: 80px;"><br>@else<br><br>@endif
+            @if($settings->slip_receiver_name)<p>( {{ $settings->slip_receiver_name }} )</p>@else<p>( .......................... )</p>@endif
         </div>
     </div>
 </div>

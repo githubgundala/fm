@@ -49,4 +49,12 @@ class Client extends Model
     {
         return $this->hasMany(Invoice::class);
     }
+
+    /**
+     * @return HasMany<Quotation, $this>
+     */
+    public function quotations(): HasMany
+    {
+        return $this->hasMany(Quotation::class);
+    }
 }

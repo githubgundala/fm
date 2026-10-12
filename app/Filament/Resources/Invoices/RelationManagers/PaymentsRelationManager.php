@@ -92,7 +92,7 @@ class PaymentsRelationManager extends RelationManager
                         app(PaymentRecorder::class)->record(
                             $owner,
                             is_numeric($amount) ? $amount : 0,
-                            is_string($method) ? $method : '',
+                            $method instanceof PaymentMethod || is_string($method) ? $method : '',
                             is_string($paymentDate) ? $paymentDate : null,
                             is_string($reference) ? $reference : null,
                             is_string($notes) ? $notes : null,

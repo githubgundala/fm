@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
@@ -92,6 +93,16 @@ class Invoice extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class)->orderBy('payment_date');
+    }
+
+    /**
+     * Quotations this invoice was converted from (usually one, may be linked to several invoices).
+     *
+     * @return BelongsToMany<Quotation, $this>
+     */
+    public function quotations(): BelongsToMany
+    {
+        return $this->belongsToMany(Quotation::class, 'quotation_invoice')->withTimestamps();
     }
 
     /**

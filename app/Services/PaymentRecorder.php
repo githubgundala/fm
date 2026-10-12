@@ -46,7 +46,13 @@ class PaymentRecorder
             ]);
         }
 
-        $methodValue = $method instanceof PaymentMethod ? $method : PaymentMethod::from($method);
+        $methodValue = $method instanceof PaymentMethod ? $method : PaymentMethod::tryFrom((string) $method);
+
+        if (! $methodValue instanceof PaymentMethod) {
+            throw ValidationException::withMessages([
+                'method' => 'Metode pembayaran tidak valid.',
+            ]);
+        }
 
         return DB::transaction(
             fn (): Payment => $invoice->payments()->create([

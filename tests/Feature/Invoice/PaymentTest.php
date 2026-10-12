@@ -9,6 +9,7 @@ use App\Models\Payment;
 use App\Models\User;
 use App\Services\PaymentRecorder;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 use function Pest\Laravel\get;
@@ -78,6 +79,20 @@ it('rejects payments to cancelled invoices', function (): void {
     app(PaymentRecorder::class)->record($invoice, 50_000, 'cash');
 })->throws(ValidationException::class);
 
+it('accepts the method as an enum instance from Filament forms', function (): void {
+    $invoice = payableInvoice();
+
+    $payment = app(PaymentRecorder::class)->record($invoice, 300_000, PaymentMethod::Cash);
+
+    expect($payment->method)->toBe(PaymentMethod::Cash);
+});
+
+it('rejects an empty payment method with a validation error', function (): void {
+    $invoice = payableInvoice();
+
+    app(PaymentRecorder::class)->record($invoice, 50_000, '');
+})->throws(ValidationException::class);
+
 it('displays the payment slip', function (): void {
     $invoice = payableInvoice();
     $payment = Payment::factory()->for($invoice, 'invoice')->create(['amount' => 300_000]);
@@ -86,6 +101,27 @@ it('displays the payment slip', function (): void {
         ->assertOk()
         ->assertSee($payment->payment_number)
         ->assertSee($invoice->invoice_number);
+});
+
+it('displays the slip receiver name from settings', function (): void {
+    InvoiceSetting::cached()->update(['slip_receiver_name' => 'Sari Kasir']);
+    $invoice = payableInvoice();
+    $payment = Payment::factory()->for($invoice, 'invoice')->create(['amount' => 300_000]);
+
+    get(route('payments.slip', $payment))
+        ->assertOk()
+        ->assertSee('Sari Kasir');
+});
+
+it('displays the signature image on the slip when configured', function (): void {
+    Storage::disk('public')->put('invoice-signatures/ttd.png', 'fake-png');
+    InvoiceSetting::cached()->update(['signature_path' => 'invoice-signatures/ttd.png']);
+    $invoice = payableInvoice();
+    $payment = Payment::factory()->for($invoice, 'invoice')->create(['amount' => 300_000]);
+
+    get(route('payments.slip', $payment))
+        ->assertOk()
+        ->assertSee('alt="Tanda tangan"', false);
 });
 
 it('redirects guests away from the payment slip', function (): void {

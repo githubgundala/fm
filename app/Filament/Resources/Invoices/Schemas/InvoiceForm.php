@@ -73,10 +73,11 @@ class InvoiceForm
                         Repeater::make('items')
                             ->relationship()
                             ->schema([
-                                TextInput::make('description')
+                                Textarea::make('description')
                                     ->label('Deskripsi')
                                     ->required()
                                     ->maxLength(500)
+                                    ->rows(3)
                                     ->columnSpan(2),
                                 TextInput::make('qty')
                                     ->label('Qty')

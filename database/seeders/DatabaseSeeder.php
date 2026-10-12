@@ -31,6 +31,7 @@ class DatabaseSeeder extends Seeder
 
         if (app()->isLocal()) {
             $this->call(InvoiceDemoSeeder::class);
+            $this->call(QuotationTemplateSeeder::class);
         }
     }
 }

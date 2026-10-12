@@ -96,6 +96,12 @@ class InvoiceSettingsPage extends Page
                             ->placeholder('cth. Budi Santoso')
                             ->maxLength(255)
                             ->columnSpanFull(),
+                        TextInput::make('slip_receiver_name')
+                            ->label('Nama Penerima (Slip Pembayaran)')
+                            ->placeholder('cth. Sari Kasir')
+                            ->helperText('Tampil pada kolom "Diterima oleh" di slip pembayaran.')
+                            ->maxLength(255)
+                            ->columnSpanFull(),
                     ]),
                 Section::make('Penomoran')
                     ->description('Nomor dokumen dibuat otomatis dan direset setiap tahun.')
@@ -108,6 +114,11 @@ class InvoiceSettingsPage extends Page
                             ->label('Prefix Pembayaran')
                             ->required()
                             ->maxLength(10),
+                        TextInput::make('quotation_prefix')
+                            ->label('Prefix Quotation')
+                            ->required()
+                            ->maxLength(10)
+                            ->helperText('Format nomor: PREFIX/YYYY/MM/NNN, reset tiap bulan.'),
                         Toggle::make('yearly_reset')
                             ->label('Reset tiap tahun')
                             ->disabled()
@@ -118,6 +129,11 @@ class InvoiceSettingsPage extends Page
                     ->schema([
                         TextInput::make('default_due_days')
                             ->label('Jatuh tempo default (hari)')
+                            ->required()
+                            ->numeric()
+                            ->minValue(0),
+                        TextInput::make('default_quotation_validity_days')
+                            ->label('Berlaku quotation default (hari)')
                             ->required()
                             ->numeric()
                             ->minValue(0),

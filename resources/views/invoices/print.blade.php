@@ -89,7 +89,7 @@
 
     <table class="ttd">
         <tr>
-            <td>Penerima,<br><br><br><br>@if($invoice->receiver_name)( <u><strong>{{ $invoice->receiver_name }}</strong></u> )@else( .......................... )@endif</td>
+            <td>Penerima,<br><br><br><br><br><br><br>@if($invoice->receiver_name)( <u><strong>{{ $invoice->receiver_name }}</strong></u> )@else( .......................... )@endif</td>
             <td>{{ $settings->company_name }}, {{ $invoice->issue_date->format('d M Y') }}<br>Hormat kami,<br>@if($signatureUrl ?? null)<img src="{{ $signatureUrl }}" alt="Tanda tangan" style="height: 80px;"><br>@else<br><br><br><br>@endif@if($settings->signature_name)( <u><strong>{{ $settings->signature_name }}</strong></u> )@else( .......................... )@endif</td>
         </tr>
     </table>

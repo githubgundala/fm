@@ -62,3 +62,14 @@ it('menyimpan path gambar tanda tangan', function (): void {
     expect(InvoiceSetting::cached()->signature_path)->toBe('invoice-signatures/ttd.png')
         ->and(InvoiceSetting::cached()->signature_name)->toBe('Budi Santoso');
 });
+
+it('menyimpan nama penerima slip pembayaran', function (): void {
+    livewire(InvoiceSettingsPage::class)
+        ->fillForm([
+            'slip_receiver_name' => 'Sari Kasir',
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect(InvoiceSetting::cached()->slip_receiver_name)->toBe('Sari Kasir');
+});

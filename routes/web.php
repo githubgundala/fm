@@ -3,7 +3,9 @@
 use App\Models\Invoice;
 use App\Models\InvoiceSetting;
 use App\Models\Payment;
+use App\Models\Quotation;
 use App\Services\InvoicePdfService;
+use App\Services\QuotationPdfService;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -14,11 +16,15 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('payments/{payment}/slip', function (Payment $payment) {
         $payment->loadMissing(['invoice.client', 'invoice.items', 'invoice.payments']);
+        $settings = InvoiceSetting::cached();
 
         return view('payments.slip', [
             'payment' => $payment,
             'invoice' => $payment->invoice,
-            'settings' => InvoiceSetting::cached(),
+            'settings' => $settings,
+            'signatureUrl' => $settings->signature_path && Storage::disk('public')->exists($settings->signature_path)
+                ? Storage::disk('public')->url($settings->signature_path)
+                : null,
         ]);
     })->name('payments.slip');
 
@@ -45,6 +51,30 @@ Route::middleware(['auth'])->group(function () {
                 : null,
         ]);
     })->name('invoices.print');
+
+    Route::get('quotations/{quotation}/pdf', function (Quotation $quotation, QuotationPdfService $pdf) {
+        return response(
+            $pdf->generate($quotation),
+            200,
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="'.$quotation->quotation_number.'.pdf"',
+            ]
+        );
+    })->name('quotations.pdf');
+
+    Route::get('quotations/{quotation}/print', function (Quotation $quotation) {
+        $quotation->loadMissing(['client', 'items', 'template']);
+        $settings = InvoiceSetting::cached();
+
+        return view('quotations.print', [
+            'quotation' => $quotation,
+            'settings' => $settings,
+            'signatureUrl' => $settings->signature_path && Storage::disk('public')->exists($settings->signature_path)
+                ? Storage::disk('public')->url($settings->signature_path)
+                : null,
+        ]);
+    })->name('quotations.print');
 });
 
 require __DIR__.'/settings.php';
