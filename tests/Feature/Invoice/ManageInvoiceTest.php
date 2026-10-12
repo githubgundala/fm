@@ -9,6 +9,7 @@ use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Services\InvoiceDuplicator;
+use App\Services\InvoiceNumberGenerator;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
@@ -136,4 +137,50 @@ it('duplicates an invoice with a fresh number', function (): void {
         ->and((float) $copy->grand_total)->toBe(200000.0);
 
     assertDatabaseHas(Invoice::class, ['invoice_number' => $copy->invoice_number]);
+});
+
+it('prefills the generated number on create but allows editing it', function (): void {
+    $client = Client::factory()->create();
+    $year = (int) now()->format('Y');
+
+    livewire(CreateInvoice::class)
+        ->fillForm([
+            'client_id' => $client->id,
+            'issue_date' => '2026-10-01',
+            'due_date' => '2026-10-15',
+            'items' => [
+                ['description' => 'Jasa A', 'qty' => 1, 'unit_price' => 100000],
+            ],
+            'currency' => 'IDR',
+            'invoice_number' => "INV-{$year}-0099",
+        ])
+        ->call('create')
+        ->assertNotified()
+        ->assertHasNoFormErrors();
+
+    assertDatabaseHas(Invoice::class, ['client_id' => $client->id, 'invoice_number' => "INV-{$year}-0099"]);
+
+    // Counter synced past the manual number, so the next auto number cannot collide.
+    expect(app(InvoiceNumberGenerator::class)->peek())->toBe("INV-{$year}-0100");
+});
+
+it('rejects a duplicate invoice number on create', function (): void {
+    $existing = Invoice::factory()->create();
+    $client = Client::factory()->create();
+
+    livewire(CreateInvoice::class)
+        ->fillForm([
+            'client_id' => $client->id,
+            'issue_date' => '2026-10-01',
+            'due_date' => '2026-10-15',
+            'items' => [
+                ['description' => 'Jasa A', 'qty' => 1, 'unit_price' => 100000],
+            ],
+            'currency' => 'IDR',
+            'invoice_number' => $existing->invoice_number,
+        ])
+        ->call('create')
+        ->assertHasFormErrors(['invoice_number']);
+
+    expect(Invoice::count())->toBe(1);
 });

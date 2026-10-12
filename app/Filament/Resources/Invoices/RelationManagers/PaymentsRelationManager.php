@@ -19,6 +19,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Validation\ValidationException;
 
 class PaymentsRelationManager extends RelationManager
 {
@@ -76,7 +77,7 @@ class PaymentsRelationManager extends RelationManager
             ->headerActions([
                 CreateAction::make()
                     ->label('Catat Pembayaran')
-                    ->action(function (array $data): void {
+                    ->action(function (array $data, Action $action): void {
                         $owner = $this->ownerRecord;
 
                         if (! $owner instanceof Invoice) {
@@ -89,14 +90,24 @@ class PaymentsRelationManager extends RelationManager
                         $reference = $data['reference'] ?? null;
                         $notes = $data['notes'] ?? null;
 
-                        app(PaymentRecorder::class)->record(
-                            $owner,
-                            is_numeric($amount) ? $amount : 0,
-                            $method instanceof PaymentMethod || is_string($method) ? $method : '',
-                            is_string($paymentDate) ? $paymentDate : null,
-                            is_string($reference) ? $reference : null,
-                            is_string($notes) ? $notes : null,
-                        );
+                        try {
+                            app(PaymentRecorder::class)->record(
+                                $owner,
+                                is_numeric($amount) ? $amount : 0,
+                                $method instanceof PaymentMethod || is_string($method) ? $method : '',
+                                is_string($paymentDate) ? $paymentDate : null,
+                                is_string($reference) ? $reference : null,
+                                is_string($notes) ? $notes : null,
+                            );
+                        } catch (ValidationException $exception) {
+                            Notification::make()
+                                ->danger()
+                                ->title('Pembayaran gagal disimpan.')
+                                ->body(collect($exception->errors())->flatten()->implode(' '))
+                                ->send();
+
+                            $action->halt();
+                        }
 
                         Notification::make()
                             ->success()

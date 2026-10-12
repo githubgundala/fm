@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Invoices\Schemas;
 use App\Enums\DiscountType;
 use App\Models\Invoice;
 use App\Models\InvoiceSetting;
+use App\Services\InvoiceNumberGenerator;
 use Closure;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
@@ -29,6 +30,14 @@ class InvoiceForm
                 Section::make('Klien & Tanggal')
                     ->columnSpanFull()
                     ->schema([
+                        TextInput::make('invoice_number')
+                            ->label('Nomor Invoice')
+                            ->required()
+                            ->maxLength(50)
+                            ->unique(table: 'invoices', column: 'invoice_number', ignoreRecord: true)
+                            ->default(fn (): string => app(InvoiceNumberGenerator::class)->peek())
+                            ->disabledOn('edit')
+                            ->helperText('Terisi otomatis, dapat diubah sebelum disimpan.'),
                         Select::make('client_id')
                             ->label('Klien')
                             ->relationship('client', 'name')

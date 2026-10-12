@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Invoices\Pages;
 use App\Enums\InvoiceStatus;
 use App\Filament\Resources\Invoices\InvoiceResource;
 use App\Filament\Resources\Invoices\Schemas\InvoiceForm;
+use App\Models\Invoice;
 use App\Services\InvoiceCalculator;
 use App\Services\InvoiceNumberGenerator;
 use Filament\Resources\Pages\CreateRecord;
@@ -19,8 +20,20 @@ class CreateInvoice extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $defaults = InvoiceForm::creationDefaults();
+        $generator = app(InvoiceNumberGenerator::class);
 
-        $data['invoice_number'] = app(InvoiceNumberGenerator::class)->next(InvoiceNumberGenerator::TYPE_INVOICE);
+        $givenNumber = trim((string) ($data['invoice_number'] ?? ''));
+
+        if ($givenNumber === '' || $givenNumber === $generator->peek()) {
+            $data['invoice_number'] = $generator->next(InvoiceNumberGenerator::TYPE_INVOICE);
+        } elseif (Invoice::query()->where('invoice_number', $givenNumber)->exists()) {
+            // Stale preview (another invoice took the number first): fall back to a fresh one.
+            $data['invoice_number'] = $generator->next(InvoiceNumberGenerator::TYPE_INVOICE);
+        } else {
+            $generator->syncCounter($givenNumber);
+            $data['invoice_number'] = $givenNumber;
+        }
+
         $data['status'] = InvoiceStatus::Draft;
         $data['due_date'] ??= $defaults['due_date'];
         $data['notes'] ??= $defaults['notes'];

@@ -42,3 +42,33 @@ it('never generates duplicate numbers', function (): void {
     expect($numbers)->toHaveCount(10)
         ->and(array_unique($numbers))->toHaveCount(10);
 });
+
+it('peeks the next number without consuming it', function (): void {
+    $generator = app(InvoiceNumberGenerator::class);
+    $year = (int) now()->format('Y');
+
+    expect($generator->peek())->toBe("INV-{$year}-0001")
+        ->and($generator->peek())->toBe("INV-{$year}-0001")
+        ->and($generator->next(InvoiceNumberGenerator::TYPE_INVOICE))->toBe("INV-{$year}-0001")
+        ->and($generator->peek())->toBe("INV-{$year}-0002");
+});
+
+it('syncs the counter past a manually entered number', function (): void {
+    $generator = app(InvoiceNumberGenerator::class);
+    $year = (int) now()->format('Y');
+
+    $generator->syncCounter("INV-{$year}-0099");
+
+    expect($generator->peek())->toBe("INV-{$year}-0100")
+        ->and($generator->next(InvoiceNumberGenerator::TYPE_INVOICE))->toBe("INV-{$year}-0100");
+});
+
+it('ignores manual numbers outside the current sequence', function (): void {
+    $generator = app(InvoiceNumberGenerator::class);
+    $year = (int) now()->format('Y');
+
+    $generator->syncCounter('CUSTOM-001');
+    $generator->syncCounter("INV-{$year}-0001");
+
+    expect($generator->peek())->toBe("INV-{$year}-0002");
+});

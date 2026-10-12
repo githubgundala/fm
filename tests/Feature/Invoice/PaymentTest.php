@@ -2,6 +2,7 @@
 
 use App\Enums\InvoiceStatus;
 use App\Enums\PaymentMethod;
+use App\Filament\Resources\Payments\Pages\CreatePayment;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\InvoiceSetting;
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 use function Pest\Laravel\get;
+use function Pest\Livewire\livewire;
 
 beforeEach(function (): void {
     $this->actingAs(User::factory()->create());
@@ -130,4 +132,22 @@ it('redirects guests away from the payment slip', function (): void {
     $payment = Payment::factory()->create();
 
     get(route('payments.slip', $payment))->assertRedirect('/login');
+});
+
+it('notifies when the payment amount exceeds the balance', function (): void {
+    $this->actingAs(superAdmin());
+    $invoice = payableInvoice();
+
+    livewire(CreatePayment::class)
+        ->fillForm([
+            'invoice_id' => $invoice->id,
+            'payment_date' => now()->format('Y-m-d'),
+            'amount' => 1_500_000,
+            'method' => PaymentMethod::Cash,
+        ])
+        ->call('create')
+        ->assertNotified()
+        ->assertHasNoFormErrors();
+
+    expect(Payment::count())->toBe(0);
 });
