@@ -20,7 +20,7 @@ class LogsPanelProvider extends PanelProvider
     {
         return $panel
             ->id('logs')
-            ->path('logs')
+            ->path('system-logs')
             ->brandName('Log Viewer')
             ->colors([
                 'primary' => Color::Slate,
@@ -35,7 +35,17 @@ class LogsPanelProvider extends PanelProvider
                 EnsureLogViewerToken::class,
             ])
             ->plugins([
-                FilamentLogViewer::make()->authorize(true)->navigationUrl('/'),
+                $this->logViewerPlugin(),
             ]);
+    }
+
+    protected function logViewerPlugin(): FilamentLogViewer
+    {
+        // FilamentLogViewer::make() returns a shared singleton, so clone it.
+        // Otherwise per-panel customization like navigationUrl('/') would leak
+        // into the admin panel and hijack its '/' dashboard route.
+        return (clone FilamentLogViewer::make())
+            ->authorize(true)
+            ->navigationUrl('/');
     }
 }
