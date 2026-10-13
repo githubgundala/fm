@@ -4,7 +4,9 @@
     <meta charset="utf-8">
     <title>Invoice {{ $invoice->invoice_number }}</title>
     <style>
-        body { font-family: Arial, DejaVu Sans, sans-serif; font-size: 11px; color: #111; margin: 0; padding: 0; }
+        * { box-sizing: border-box; }
+        body { font-family: Arial, DejaVu Sans, sans-serif; color: #111; margin: 0; padding: 24px; font-size: 11px; }
+        .page { padding: 32px; }
         .kop { width: 100%; border-bottom: 2px solid #111; padding-bottom: 8px; margin-bottom: 12px; }
         .kop td { vertical-align: top; }
         .kop h1 { font-size: 18px; margin: 0 0 4px; }
@@ -21,7 +23,7 @@
         .meta col.col-value { width: 30%; }
         .meta td.label { color: #444; }
         .meta td.colon { color: #444; }
-        .meta td.value { word-wrap: break-word; }
+        .meta td.value { word-wrap: break-word; overflow-wrap: break-word; }
         .meta td.nowrap { white-space: nowrap; }
         table.items { width: 100%; border-collapse: collapse; margin: 8px 0; }
         table.items th, table.items td { border: 1px solid #333; padding: 6px; font-size: 11px; }
@@ -39,11 +41,13 @@
     </style>
 </head>
 <body>
+<div class="page">
 @include('invoices.partials.document', [
     'invoice' => $invoice,
     'settings' => $settings,
     'logoSrc' => $logoBase64 ?? null,
     'signatureSrc' => $signatureBase64 ?? null,
 ])
+</div>
 </body>
 </html>

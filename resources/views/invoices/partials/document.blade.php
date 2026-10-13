@@ -19,12 +19,12 @@
 
 <table class="meta">
     <colgroup>
-        <col class="col-label">
-        <col class="col-colon">
-        <col class="col-value">
-        <col class="col-label">
-        <col class="col-colon">
-        <col class="col-value">
+        <col class="col-label" style="width: 17%;">
+        <col class="col-colon" style="width: 3%;">
+        <col class="col-value" style="width: 30%;">
+        <col class="col-label" style="width: 17%;">
+        <col class="col-colon" style="width: 3%;">
+        <col class="col-value" style="width: 30%;">
     </colgroup>
     <tr>
         <td class="label">Ditagihkan kepada</td>
