@@ -27,7 +27,7 @@ class ClientResource extends Resource
 
     protected static ?string $navigationLabel = 'Klien';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Tagihan';
+    protected static string|UnitEnum|null $navigationGroup = 'Master Data';
 
     protected static ?int $navigationSort = 1;
 

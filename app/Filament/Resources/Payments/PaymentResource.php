@@ -26,7 +26,7 @@ class PaymentResource extends Resource
 
     protected static ?string $navigationLabel = 'Pembayaran';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Tagihan';
+    protected static string|UnitEnum|null $navigationGroup = 'Invoice & Quotation';
 
     protected static ?int $navigationSort = 3;
 

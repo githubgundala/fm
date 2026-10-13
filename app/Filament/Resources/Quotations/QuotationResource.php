@@ -28,7 +28,7 @@ class QuotationResource extends Resource
 
     protected static ?string $navigationLabel = 'Quotation';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Penjualan';
+    protected static string|UnitEnum|null $navigationGroup = 'Invoice & Quotation';
 
     protected static ?int $navigationSort = 1;
 
