@@ -46,6 +46,9 @@ Route::middleware(['auth'])->group(function () {
         return view('invoices.print', [
             'invoice' => $invoice,
             'settings' => $settings,
+            'logoUrl' => $settings->logo_path && Storage::disk('public')->exists($settings->logo_path)
+                ? Storage::disk('public')->url($settings->logo_path)
+                : null,
             'signatureUrl' => $settings->signature_path && Storage::disk('public')->exists($settings->signature_path)
                 ? Storage::disk('public')->url($settings->signature_path)
                 : null,
