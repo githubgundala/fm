@@ -78,11 +78,6 @@ class InvoicesTable
                 ViewAction::make(),
                 EditAction::make()
                     ->visible(fn (Invoice $record): bool => in_array($record->status, [InvoiceStatus::Draft, InvoiceStatus::Sent], true)),
-                Action::make('downloadPdf')
-                    ->label('PDF')
-                    ->icon('heroicon-o-arrow-down-tray')
-                    ->url(fn (Invoice $record): string => route('invoices.pdf', $record))
-                    ->openUrlInNewTab(),
                 Action::make('print')
                     ->label('Cetak')
                     ->icon('heroicon-o-printer')

@@ -21,16 +21,6 @@ function pdfInvoice(?float $taxRate = 11): Invoice
     return $invoice->refresh();
 }
 
-it('downloads the invoice as a pdf file', function (): void {
-    $invoice = pdfInvoice();
-
-    $response = get(route('invoices.pdf', $invoice));
-
-    $response->assertOk();
-    expect($response->headers->get('Content-Type'))->toBe('application/pdf')
-        ->and($response->getContent())->toStartWith('%PDF');
-});
-
 it('generates a pdf larger than 5kb containing totals', function (): void {
     $invoice = pdfInvoice();
 
@@ -103,11 +93,10 @@ it('displays the print page', function (): void {
         ->assertSee('window.print()', false);
 });
 
-it('redirects guests away from pdf and print pages', function (): void {
+it('redirects guests away from the print page', function (): void {
     auth()->logout();
 
     $invoice = Invoice::factory()->create();
 
-    get(route('invoices.pdf', $invoice))->assertRedirect('/login');
     get(route('invoices.print', $invoice))->assertRedirect('/login');
 });

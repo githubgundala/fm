@@ -4,7 +4,6 @@ use App\Models\Invoice;
 use App\Models\InvoiceSetting;
 use App\Models\Payment;
 use App\Models\Quotation;
-use App\Services\InvoicePdfService;
 use App\Services\QuotationPdfService;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -27,17 +26,6 @@ Route::middleware(['auth'])->group(function () {
                 : null,
         ]);
     })->name('payments.slip');
-
-    Route::get('invoices/{invoice}/pdf', function (Invoice $invoice, InvoicePdfService $pdf) {
-        return response(
-            $pdf->generate($invoice),
-            200,
-            [
-                'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'attachment; filename="'.$invoice->invoice_number.'.pdf"',
-            ]
-        );
-    })->name('invoices.pdf');
 
     Route::get('invoices/{invoice}/print', function (Invoice $invoice) {
         $invoice->loadMissing(['client', 'items', 'payments']);

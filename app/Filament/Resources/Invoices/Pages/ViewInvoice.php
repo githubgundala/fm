@@ -23,11 +23,6 @@ class ViewInvoice extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('downloadPdf')
-                ->label('Unduh PDF')
-                ->icon('heroicon-o-arrow-down-tray')
-                ->url(fn (Invoice $record): string => route('invoices.pdf', $record))
-                ->openUrlInNewTab(),
             Action::make('print')
                 ->label('Cetak')
                 ->icon('heroicon-o-printer')
