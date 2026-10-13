@@ -16,12 +16,12 @@
         .judul { text-align: center; margin: 10px 0; }
         .judul h2 { font-size: 16px; margin: 0; letter-spacing: 2px; }
         .judul p { margin: 2px 0 0; font-size: 11px; }
-        .meta { width: 100%; margin-bottom: 10px; table-layout: fixed; border-collapse: collapse; }
+        .meta-wrap { width: 100%; table-layout: fixed; border-collapse: collapse; margin-bottom: 10px; }
+        .meta-wrap td.meta-half { vertical-align: top; padding: 0; }
+        .meta-wrap td.meta-half-right { padding-left: 16px; }
+        .meta { width: 100%; table-layout: fixed; border-collapse: collapse; }
         .meta td { vertical-align: top; padding: 2px 4px; font-size: 11px; }
-        .meta col.col-label { width: 17%; }
-        .meta col.col-colon { width: 3%; }
-        .meta col.col-value { width: 30%; }
-        .meta td.label { color: #444; }
+        .meta td.label { color: #444; white-space: nowrap; }
         .meta td.colon { color: #444; }
         .meta td.value { word-wrap: break-word; overflow-wrap: break-word; }
         .meta td.nowrap { white-space: nowrap; }

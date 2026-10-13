@@ -17,38 +17,60 @@
     <p>No. {{ $invoice->invoice_number }}</p>
 </div>
 
-<table class="meta">
+<table class="meta-wrap">
     <colgroup>
-        <col class="col-label" style="width: 17%;">
-        <col class="col-colon" style="width: 3%;">
-        <col class="col-value" style="width: 30%;">
-        <col class="col-label" style="width: 17%;">
-        <col class="col-colon" style="width: 3%;">
-        <col class="col-value" style="width: 30%;">
+        <col style="width: 50%;">
+        <col style="width: 50%;">
     </colgroup>
     <tr>
-        <td class="label">Ditagihkan kepada</td>
-        <td class="colon">:</td>
-        <td class="value"><strong>{{ $invoice->client->name }}</strong>@if($invoice->client->company) ({{ $invoice->client->company }})@endif</td>
-        <td class="label">Tanggal Terbit</td>
-        <td class="colon">:</td>
-        <td class="value nowrap">{{ $invoice->issue_date->format('d M Y') }}</td>
-    </tr>
-    <tr>
-        <td class="label">Alamat</td>
-        <td class="colon">:</td>
-        <td class="value">{{ $invoice->billing_address ?? $invoice->client->address ?? '-' }}@if($invoice->client->tax_id)<br>NPWP: {{ $invoice->client->tax_id }}@endif</td>
-        <td class="label">Jatuh Tempo</td>
-        <td class="colon">:</td>
-        <td class="value nowrap">{{ $invoice->due_date->format('d M Y') }}</td>
-    </tr>
-    <tr>
-        <td class="label">Status</td>
-        <td class="colon">:</td>
-        <td class="value">{{ strtoupper(str_replace('_', ' ', $invoice->status->value)) }}</td>
-        <td class="label">Mata Uang</td>
-        <td class="colon">:</td>
-        <td class="value nowrap">{{ $invoice->currency }}</td>
+        <td class="meta-half">
+            <table class="meta">
+                <colgroup>
+                    <col style="width: 37%;">
+                    <col style="width: 6%;">
+                    <col style="width: 57%;">
+                </colgroup>
+                <tr>
+                    <td class="label">Ditagihkan kepada</td>
+                    <td class="colon">:</td>
+                    <td class="value"><strong>{{ $invoice->client->name }}</strong>@if($invoice->client->company) ({{ $invoice->client->company }})@endif</td>
+                </tr>
+                <tr>
+                    <td class="label">Alamat</td>
+                    <td class="colon">:</td>
+                    <td class="value">{{ $invoice->billing_address ?? $invoice->client->address ?? '-' }}@if($invoice->client->tax_id)<br>NPWP: {{ $invoice->client->tax_id }}@endif</td>
+                </tr>
+                <tr>
+                    <td class="label">Status</td>
+                    <td class="colon">:</td>
+                    <td class="value">{{ strtoupper(str_replace('_', ' ', $invoice->status->value)) }}</td>
+                </tr>
+            </table>
+        </td>
+        <td class="meta-half meta-half-right">
+            <table class="meta">
+                <colgroup>
+                    <col style="width: 37%;">
+                    <col style="width: 6%;">
+                    <col style="width: 57%;">
+                </colgroup>
+                <tr>
+                    <td class="label">Tanggal Terbit</td>
+                    <td class="colon">:</td>
+                    <td class="value nowrap">{{ $invoice->issue_date->format('d M Y') }}</td>
+                </tr>
+                <tr>
+                    <td class="label">Jatuh Tempo</td>
+                    <td class="colon">:</td>
+                    <td class="value nowrap">{{ $invoice->due_date->format('d M Y') }}</td>
+                </tr>
+                <tr>
+                    <td class="label">Mata Uang</td>
+                    <td class="colon">:</td>
+                    <td class="value nowrap">{{ $invoice->currency }}</td>
+                </tr>
+            </table>
+        </td>
     </tr>
 </table>
 
