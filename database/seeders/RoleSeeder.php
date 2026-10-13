@@ -42,7 +42,6 @@ class RoleSeeder extends Seeder
                         "Replicate:{$resource}",
                     ])
                 )
-                ->merge(['View:SettingsHub'])
                 ->all()
         );
 

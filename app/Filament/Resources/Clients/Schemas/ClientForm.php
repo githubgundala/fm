@@ -21,7 +21,7 @@ class ClientForm
                 TextInput::make('email')
                     ->label('Email address')
                     ->email()
-                    ->required()
+                    ->nullable()
                     ->unique(ignoreRecord: true)
                     ->maxLength(255),
                 TextInput::make('phone')

@@ -31,7 +31,7 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
-            ->path('admin')
+            ->path('')
             ->login()
             ->profile(EditProfile::class)
             ->colors([
@@ -62,7 +62,9 @@ class AdminPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->plugins([
-                FilamentShieldPlugin::make(),
+                FilamentShieldPlugin::make()
+                    ->navigationGroup('Pengaturan')
+                    ->navigationSort(101),
             ])
             ->authMiddleware([
                 Authenticate::class,

@@ -53,6 +53,8 @@ class QuotationConverter
                 'currency' => $quotation->currency,
                 'notes' => $quotation->notes,
                 'terms' => $quotation->terms,
+                'receiver_name' => $quotation->receiver_name,
+                'billing_address' => $quotation->client->address,
                 'created_by' => auth()->id(),
             ]);
             $invoice->save();

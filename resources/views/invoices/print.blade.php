@@ -24,8 +24,9 @@
         .totals td { padding: 5px; }
         .totals tr.grand td { font-weight: bold; border-top: 2px solid #111; font-size: 16px; }
         .catatan { margin-top: 16px; font-size: 12px; color: #333; }
-        .ttd { width: 100%; margin-top: 48px; }
-        .ttd td { text-align: center; width: 50%; }
+        .ttd { width: 100%; margin-top: 48px; border-collapse: collapse; }
+        .ttd td { text-align: center; width: 50%; vertical-align: top; }
+        .ttd td.sign-area { height: 90px; vertical-align: bottom; }
         .toolbar { max-width: 800px; margin: 0 auto 16px; text-align: right; }
         .toolbar button { padding: 8px 20px; font-size: 14px; cursor: pointer; }
         @media print {
@@ -54,7 +55,7 @@
     </div>
 
     <table class="meta">
-        <tr><td class="label">Ditagihkan kepada</td><td><strong>{{ $invoice->client->name }}</strong>@if($invoice->client->company) ({{ $invoice->client->company }})@endif<br>{{ $invoice->client->address ?? '' }}@if($invoice->client->tax_id)<br>NPWP: {{ $invoice->client->tax_id }}@endif</td></tr>
+        <tr><td class="label">Ditagihkan kepada</td><td><strong>{{ $invoice->client->name }}</strong>@if($invoice->client->company) ({{ $invoice->client->company }})@endif<br>{{ $invoice->billing_address ?? $invoice->client->address ?? '' }}@if($invoice->client->tax_id)<br>NPWP: {{ $invoice->client->tax_id }}@endif</td></tr>
         <tr><td class="label">Tanggal Terbit</td><td>{{ $invoice->issue_date->format('d M Y') }}</td></tr>
         <tr><td class="label">Jatuh Tempo</td><td>{{ $invoice->due_date->format('d M Y') }}</td></tr>
     </table>
@@ -89,8 +90,16 @@
 
     <table class="ttd">
         <tr>
-            <td>Penerima,<br><br><br><br><br><br><br>@if($invoice->receiver_name)( <u><strong>{{ $invoice->receiver_name }}</strong></u> )@else( .......................... )@endif</td>
-            <td>{{ $settings->company_name }}, {{ $invoice->issue_date->format('d M Y') }}<br>Hormat kami,<br>@if($signatureUrl ?? null)<img src="{{ $signatureUrl }}" alt="Tanda tangan" style="height: 80px;"><br>@else<br><br><br><br>@endif@if($settings->signature_name)( <u><strong>{{ $settings->signature_name }}</strong></u> )@else( .......................... )@endif</td>
+            <td>Penerima,</td>
+            <td>{{ $settings->company_name }}, {{ $invoice->issue_date->format('d M Y') }}<br>Hormat kami,</td>
+        </tr>
+        <tr>
+            <td class="sign-area"></td>
+            <td class="sign-area">@if($signatureUrl ?? null)<img src="{{ $signatureUrl }}" alt="Tanda tangan" style="height: 80px; max-height: 80px;">@endif</td>
+        </tr>
+        <tr>
+            <td>@if($invoice->receiver_name)( <u><strong>{{ $invoice->receiver_name }}</strong></u> )@else( .......................... )@endif</td>
+            <td>@if($settings->signature_name)( <u><strong>{{ $settings->signature_name }}</strong></u> )@else( .......................... )@endif</td>
         </tr>
     </table>
 </div>

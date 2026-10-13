@@ -37,7 +37,8 @@ class QuotationInfolist
                         TextEntry::make('client.name')
                             ->label('Klien'),
                         TextEntry::make('client.email')
-                            ->label('Email Klien'),
+                            ->label('Email Klien')
+                            ->placeholder('-'),
                         TextEntry::make('receiver_name')
                             ->label('Nama Penerima')
                             ->placeholder('-'),

@@ -31,9 +31,13 @@ class InvoiceInfolist
                         TextEntry::make('client.name')
                             ->label('Klien'),
                         TextEntry::make('client.email')
-                            ->label('Email Klien'),
+                            ->label('Email Klien')
+                            ->placeholder('-'),
                         TextEntry::make('receiver_name')
                             ->label('Nama Penerima')
+                            ->placeholder('-'),
+                        TextEntry::make('billing_address')
+                            ->label('Alamat')
                             ->placeholder('-'),
                     ])
                     ->columns(3),

@@ -9,7 +9,7 @@ use App\Services\QuotationPdfService;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
-Route::view('/', 'welcome')->name('home');
+// Route::view('/', 'welcome')->name('home');
 
 Route::middleware(['auth'])->group(function () {
     Route::view('dashboard', 'dashboard')->name('dashboard');

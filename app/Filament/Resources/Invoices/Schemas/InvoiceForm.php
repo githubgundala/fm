@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Invoices\Schemas;
 
 use App\Enums\DiscountType;
+use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\InvoiceSetting;
 use App\Services\InvoiceNumberGenerator;
@@ -14,6 +15,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Carbon;
 
@@ -44,6 +46,22 @@ class InvoiceForm
                             ->searchable()
                             ->preload()
                             ->required()
+                            ->live()
+                            ->afterStateUpdated(function (Set $set, Get $get, ?string $state): void {
+                                if (! $state) {
+                                    return;
+                                }
+
+                                if (filled($get('billing_address'))) {
+                                    return;
+                                }
+
+                                $client = Client::find($state);
+
+                                if ($client?->address) {
+                                    $set('billing_address', $client->address);
+                                }
+                            })
                             ->createOptionForm([
                                 TextInput::make('name')
                                     ->required()
@@ -52,11 +70,14 @@ class InvoiceForm
                                     ->maxLength(255),
                                 TextInput::make('email')
                                     ->email()
-                                    ->required()
+                                    ->nullable()
                                     ->maxLength(255),
                                 TextInput::make('phone')
                                     ->tel()
                                     ->maxLength(50),
+                                Textarea::make('address')
+                                    ->label('Alamat')
+                                    ->rows(3),
                             ]),
                         DatePicker::make('issue_date')
                             ->label('Tanggal Terbit')
@@ -141,6 +162,11 @@ class InvoiceForm
                             ->label('Nama Penerima')
                             ->placeholder('cth. Andi (PT Maju)')
                             ->maxLength(255)
+                            ->columnSpanFull(),
+                        Textarea::make('billing_address')
+                            ->label('Alamat')
+                            ->placeholder('Alamat penagihan / pengiriman — otomatis terisi dari alamat klien, dapat diubah.')
+                            ->rows(3)
                             ->columnSpanFull(),
                         Textarea::make('notes')
                             ->label('Catatan')

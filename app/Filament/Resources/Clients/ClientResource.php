@@ -42,7 +42,8 @@ class ClientResource extends Resource
             ->components([
                 Infolists\Components\TextEntry::make('name'),
                 Infolists\Components\TextEntry::make('company'),
-                Infolists\Components\TextEntry::make('email'),
+                Infolists\Components\TextEntry::make('email')
+                    ->placeholder('-'),
                 Infolists\Components\TextEntry::make('phone'),
                 Infolists\Components\TextEntry::make('tax_id')
                     ->label('NPWP / Tax ID'),

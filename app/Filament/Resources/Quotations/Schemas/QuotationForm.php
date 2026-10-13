@@ -90,7 +90,7 @@ class QuotationForm
                                     ->maxLength(255),
                                 TextInput::make('email')
                                     ->email()
-                                    ->required()
+                                    ->nullable()
                                     ->maxLength(255),
                                 TextInput::make('phone')
                                     ->tel()

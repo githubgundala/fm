@@ -34,6 +34,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $terms
  * @property string|null $footer
  * @property string|null $receiver_name
+ * @property string|null $billing_address
  * @property Carbon|null $sent_at
  * @property Carbon|null $paid_at
  * @property int|null $created_by
@@ -41,7 +42,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
  */
-#[Fillable(['invoice_number', 'client_id', 'issue_date', 'due_date', 'status', 'subtotal', 'discount_type', 'discount_value', 'tax_rate', 'tax_amount', 'grand_total', 'amount_paid', 'amount_due', 'currency', 'notes', 'terms', 'footer', 'receiver_name', 'sent_at', 'paid_at', 'created_by'])]
+#[Fillable(['invoice_number', 'client_id', 'issue_date', 'due_date', 'status', 'subtotal', 'discount_type', 'discount_value', 'tax_rate', 'tax_amount', 'grand_total', 'amount_paid', 'amount_due', 'currency', 'notes', 'terms', 'footer', 'receiver_name', 'billing_address', 'sent_at', 'paid_at', 'created_by'])]
 class Invoice extends Model
 {
     /** @use HasFactory<InvoiceFactory> */

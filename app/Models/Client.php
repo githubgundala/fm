@@ -14,7 +14,7 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property string $name
  * @property string|null $company
- * @property string $email
+ * @property string|null $email
  * @property string|null $phone
  * @property string|null $address
  * @property string|null $tax_id

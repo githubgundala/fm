@@ -25,8 +25,9 @@
         table.totals td.angka { text-align: right; }
         table.totals tr.grand td { font-weight: bold; border-top: 1px solid #333; font-size: 12px; }
         .catatan { margin-top: 14px; font-size: 10px; }
-        .ttd { width: 100%; margin-top: 36px; }
-        .ttd td { text-align: center; font-size: 11px; width: 50%; }
+        .ttd { width: 100%; margin-top: 36px; border-collapse: collapse; }
+        .ttd td { text-align: center; font-size: 11px; width: 50%; vertical-align: top; }
+        .ttd td.sign-area { height: 85px; vertical-align: bottom; }
     </style>
 </head>
 <body>
@@ -58,7 +59,7 @@
     </tr>
     <tr>
         <td class="label">Alamat</td>
-        <td>: {{ $invoice->client->address ?? '-' }}@if($invoice->client->tax_id)<br>&nbsp;&nbsp;NPWP: {{ $invoice->client->tax_id }}@endif</td>
+        <td>: {{ $invoice->billing_address ?? $invoice->client->address ?? '-' }}@if($invoice->client->tax_id)<br>&nbsp;&nbsp;NPWP: {{ $invoice->client->tax_id }}@endif</td>
         <td class="label">Jatuh Tempo</td>
         <td>: {{ $invoice->due_date->format('d M Y') }}</td>
     </tr>
@@ -103,8 +104,16 @@
 
 <table class="ttd">
     <tr>
-        <td>Penerima,<br><br><br><br><br><br><br>@if($invoice->receiver_name)( <u><strong>{{ $invoice->receiver_name }}</strong></u> )@else( .......................... )@endif</td>
-        <td>{{ $settings->company_name }}, {{ $invoice->issue_date->format('d M Y') }}<br>Hormat kami,<br>@if($signatureBase64 ?? null)<img src="{{ $signatureBase64 }}" alt="Tanda tangan" style="height: 80px;"><br>@else<br><br><br><br>@endif@if($settings->signature_name)( <u><strong>{{ $settings->signature_name }}</strong></u> )@else( .......................... )@endif</td>
+        <td>Penerima,</td>
+        <td>{{ $settings->company_name }}, {{ $invoice->issue_date->format('d M Y') }}<br>Hormat kami,</td>
+    </tr>
+    <tr>
+        <td class="sign-area"></td>
+        <td class="sign-area">@if($signatureBase64 ?? null)<img src="{{ $signatureBase64 }}" alt="Tanda tangan" style="height: 80px; max-height: 80px;">@endif</td>
+    </tr>
+    <tr>
+        <td>@if($invoice->receiver_name)( <u><strong>{{ $invoice->receiver_name }}</strong></u> )@else( .......................... )@endif</td>
+        <td>@if($settings->signature_name)( <u><strong>{{ $settings->signature_name }}</strong></u> )@else( .......................... )@endif</td>
     </tr>
 </table>
 </body>

@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Invoices\Pages;
 use App\Enums\InvoiceStatus;
 use App\Filament\Resources\Invoices\InvoiceResource;
 use App\Filament\Resources\Invoices\Schemas\InvoiceForm;
+use App\Models\Client;
 use App\Models\Invoice;
 use App\Services\InvoiceCalculator;
 use App\Services\InvoiceNumberGenerator;
@@ -40,6 +41,10 @@ class CreateInvoice extends CreateRecord
         $data['terms'] ??= $defaults['terms'];
         $data['currency'] ??= 'IDR';
         $data['created_by'] = auth()->id();
+
+        if (empty(trim((string) ($data['billing_address'] ?? ''))) && ! empty($data['client_id'])) {
+            $data['billing_address'] = Client::find($data['client_id'])?->address;
+        }
 
         $calculator = app(InvoiceCalculator::class);
         $subtotal = 0.0;
