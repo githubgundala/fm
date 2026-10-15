@@ -23,6 +23,7 @@ class PaymentRecorder
         ?string $paymentDate = null,
         ?string $reference = null,
         ?string $notes = null,
+        ?string $paymentNumber = null,
     ): Payment {
         if (! $invoice->canReceivePayment()) {
             throw ValidationException::withMessages([
@@ -56,7 +57,7 @@ class PaymentRecorder
 
         return DB::transaction(
             fn (): Payment => $invoice->payments()->create([
-                'payment_number' => app(InvoiceNumberGenerator::class)->next(InvoiceNumberGenerator::TYPE_PAYMENT),
+                'payment_number' => $this->resolvePaymentNumber($paymentNumber),
                 'payment_date' => $paymentDate ?? now()->format('Y-m-d'),
                 'amount' => $amountValue,
                 'method' => $methodValue,
@@ -65,5 +66,23 @@ class PaymentRecorder
                 'received_by' => auth()->id(),
             ])
         );
+    }
+
+    private function resolvePaymentNumber(?string $paymentNumber): string
+    {
+        $generator = app(InvoiceNumberGenerator::class);
+        $given = trim((string) ($paymentNumber ?? ''));
+
+        if ($given === '' || $given === $generator->peekFor(InvoiceNumberGenerator::TYPE_PAYMENT)) {
+            return $generator->next(InvoiceNumberGenerator::TYPE_PAYMENT);
+        }
+
+        if (Payment::query()->where('payment_number', $given)->exists()) {
+            return $generator->next(InvoiceNumberGenerator::TYPE_PAYMENT);
+        }
+
+        $generator->syncCounter($given, InvoiceNumberGenerator::TYPE_PAYMENT);
+
+        return $given;
     }
 }

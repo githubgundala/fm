@@ -28,6 +28,7 @@ class CreatePayment extends CreateRecord
         $paymentDate = $data['payment_date'] ?? null;
         $reference = $data['reference'] ?? null;
         $notes = $data['notes'] ?? null;
+        $paymentNumber = $data['payment_number'] ?? null;
 
         /** @var Payment $payment */
         try {
@@ -38,6 +39,7 @@ class CreatePayment extends CreateRecord
                 is_string($paymentDate) ? $paymentDate : null,
                 is_string($reference) ? $reference : null,
                 is_string($notes) ? $notes : null,
+                is_string($paymentNumber) ? $paymentNumber : null,
             );
         } catch (ValidationException $exception) {
             Notification::make()

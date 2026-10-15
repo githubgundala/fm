@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Payments\Schemas;
 use App\Enums\InvoiceStatus;
 use App\Enums\PaymentMethod;
 use App\Models\Invoice;
+use App\Services\InvoiceNumberGenerator;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -22,6 +23,14 @@ class PaymentForm
                 Section::make('Invoice & Pembayaran')
                     ->columnSpanFull()
                     ->schema([
+                        TextInput::make('payment_number')
+                            ->label('Nomor Payment')
+                            ->required()
+                            ->maxLength(50)
+                            ->unique(table: 'payments', column: 'payment_number', ignoreRecord: true)
+                            ->default(fn (): string => app(InvoiceNumberGenerator::class)->peekFor(InvoiceNumberGenerator::TYPE_PAYMENT))
+                            ->disabledOn('edit')
+                            ->helperText('Terisi otomatis, dapat diubah sebelum disimpan.'),
                         Select::make('invoice_id')
                             ->label('Invoice')
                             ->options(

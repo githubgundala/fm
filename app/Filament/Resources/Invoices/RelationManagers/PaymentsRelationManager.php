@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Invoices\RelationManagers;
 use App\Enums\PaymentMethod;
 use App\Models\Invoice;
 use App\Models\Payment;
+use App\Services\InvoiceNumberGenerator;
 use App\Services\PaymentRecorder;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
@@ -31,6 +32,13 @@ class PaymentsRelationManager extends RelationManager
     {
         return $schema
             ->components([
+                TextInput::make('payment_number')
+                    ->label('Nomor Payment')
+                    ->required()
+                    ->maxLength(50)
+                    ->unique(table: 'payments', column: 'payment_number', ignoreRecord: true)
+                    ->default(fn (): string => app(InvoiceNumberGenerator::class)->peekFor(InvoiceNumberGenerator::TYPE_PAYMENT))
+                    ->helperText('Terisi otomatis, dapat diubah sebelum disimpan.'),
                 DatePicker::make('payment_date')
                     ->label('Tanggal Bayar')
                     ->required(),
@@ -89,6 +97,7 @@ class PaymentsRelationManager extends RelationManager
                         $paymentDate = $data['payment_date'] ?? null;
                         $reference = $data['reference'] ?? null;
                         $notes = $data['notes'] ?? null;
+                        $paymentNumber = $data['payment_number'] ?? null;
 
                         try {
                             app(PaymentRecorder::class)->record(
@@ -98,6 +107,7 @@ class PaymentsRelationManager extends RelationManager
                                 is_string($paymentDate) ? $paymentDate : null,
                                 is_string($reference) ? $reference : null,
                                 is_string($notes) ? $notes : null,
+                                is_string($paymentNumber) ? $paymentNumber : null,
                             );
                         } catch (ValidationException $exception) {
                             Notification::make()

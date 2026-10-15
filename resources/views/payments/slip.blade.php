@@ -23,7 +23,10 @@
         table.rincian td.angka, table.rincian th.angka { text-align: right; }
         tr.total td { font-weight: bold; }
         .sign { display: table; width: 100%; margin-top: 40px; }
-        .sign div { display: table-cell; text-align: center; width: 50%; }
+        .sign div.col { display: table-cell; text-align: center; width: 50%; vertical-align: bottom; }
+        .sign p { margin: 4px 0; }
+        .sign .ttd { height: 80px; line-height: 80px; }
+        .sign .ttd img { height: 80px; vertical-align: middle; }
         .toolbar { max-width: 720px; margin: 0 auto 16px; text-align: right; }
         .toolbar button { padding: 8px 20px; font-size: 14px; cursor: pointer; }
         @media print {
@@ -68,15 +71,16 @@
     </table>
 
     <div class="sign">
-        <div>
+        <div class="col">
+            <p>&nbsp;</p>
             <p>Dibayar oleh,</p>
-            <br><br><br>
+            <div class="ttd">&nbsp;</div>
             <p>( {{ $invoice->client->name }} )</p>
         </div>
-        <div>
+        <div class="col">
             <p>{{ $settings->company_name }}, {{ $payment->payment_date->format('d M Y') }}</p>
             <p>Diterima oleh,</p>
-            @if($signatureUrl ?? null)<img src="{{ $signatureUrl }}" alt="Tanda tangan" style="height: 80px;"><br>@else<br><br>@endif
+            <div class="ttd">@if($signatureUrl ?? null)<img src="{{ $signatureUrl }}" alt="Tanda tangan">@endif</div>
             @if($settings->slip_receiver_name)<p>( {{ $settings->slip_receiver_name }} )</p>@else<p>( .......................... )</p>@endif
         </div>
     </div>
