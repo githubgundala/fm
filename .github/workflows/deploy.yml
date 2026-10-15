@@ -2,7 +2,8 @@ name: Deploy Migration to Hostinger
 
 on:
   push:
-    branches: [ "master" ]   # sesuaikan dengan branch utama kamu
+    branches:
+      - master
 
 jobs:
   migrate:
@@ -13,12 +14,12 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.HOSTINGER_SSH_KEY }}" > ~/.ssh/id_ed25519
-          echo "${{ secrets.HOSTINGER_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
           chmod 600 ~/.ssh/id_ed25519
 
-      - name: Run migrations on Hostinger
+      - name: Run Migration
         run: |
-          ssh -o StrictHostKeyChecking=no user@46.202.186.143 << 'EOF'
-            cd /home/username/domains/agrp.my.id/public_html/fm
-            php artisan migrate --force
-          EOF
+          ssh -i ~/.ssh/id_ed25519 \
+              -p 65002 \
+              -o StrictHostKeyChecking=no \
+              u123456789@46.202.186.143 \
+              "cd ~/domains/agrp.my.id/public_html/fm && php artisan migrate --force"
