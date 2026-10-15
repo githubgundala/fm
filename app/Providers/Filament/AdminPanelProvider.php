@@ -2,11 +2,14 @@
 
 namespace App\Providers\Filament;
 
+use AchyutN\FilamentLogViewer\FilamentLogViewer;
 use App\Filament\Auth\Pages\EditProfile;
 use App\Filament\Widgets\InvoiceStatsOverview;
 use App\Filament\Widgets\OverdueInvoicesTable;
 use App\Filament\Widgets\RevenueChart;
+use App\Models\WebsiteSetting;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use Exception;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -22,8 +25,8 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use AchyutN\FilamentLogViewer\FilamentLogViewer;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -36,8 +39,11 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->profile(EditProfile::class)
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => self::resolvePrimaryColor(),
             ])
+            ->brandLogo(fn (): ?string => self::resolveLogoUrl())
+            ->brandLogoHeight('2rem')
+            ->favicon(fn (): ?string => self::resolveFaviconUrl() ?? asset('favicon.ico'))
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([
@@ -66,10 +72,52 @@ class AdminPanelProvider extends PanelProvider
                 FilamentShieldPlugin::make()
                     ->navigationGroup('Pengaturan')
                     ->navigationSort(101),
-                    FilamentLogViewer::make(),
+                FilamentLogViewer::make(),
             ])
             ->authMiddleware([
                 Authenticate::class,
             ]);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected static function resolvePrimaryColor(): array
+    {
+        try {
+            if (! Schema::hasTable('website_settings')) {
+                return Color::Amber;
+            }
+
+            return WebsiteSetting::cached()->primaryColor();
+        } catch (Exception) {
+            return Color::Amber;
+        }
+    }
+
+    protected static function resolveLogoUrl(): ?string
+    {
+        try {
+            if (! Schema::hasTable('website_settings')) {
+                return null;
+            }
+
+            return WebsiteSetting::cached()->logoUrl();
+        } catch (Exception) {
+            return null;
+        }
+    }
+
+    protected static function resolveFaviconUrl(): ?string
+    {
+        try {
+            if (! Schema::hasTable('website_settings')) {
+                return null;
+            }
+
+            return WebsiteSetting::cached()->faviconUrl();
+        } catch (Exception) {
+            return null;
+        }
     }
 }
