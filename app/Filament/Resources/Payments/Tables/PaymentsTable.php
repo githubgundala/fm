@@ -12,12 +12,14 @@ use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class PaymentsTable
 {
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with('invoice'))
             ->columns([
                 TextColumn::make('payment_number')
                     ->label('Nomor')
@@ -38,6 +40,11 @@ class PaymentsTable
                 TextColumn::make('method')
                     ->label('Metode')
                     ->badge(),
+                TextColumn::make('lunas')
+                    ->label('Pelunasan')
+                    ->badge()
+                    ->state(fn (Payment $record): string => ($record->invoice?->isPaidOff() ?? false) ? 'LUNAS' : 'Belum Lunas')
+                    ->color(fn (Payment $record): string => ($record->invoice?->isPaidOff() ?? false) ? 'success' : 'gray'),
                 TextColumn::make('reference')
                     ->label('Referensi')
                     ->searchable()

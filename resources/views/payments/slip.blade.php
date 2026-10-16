@@ -7,7 +7,7 @@
     <style>
         * { box-sizing: border-box; }
         body { font-family: DejaVu Sans, Arial, sans-serif; color: #111; margin: 0; padding: 24px; font-size: 14px; }
-        .slip { max-width: 720px; margin: 0 auto; border: 1px solid #333; padding: 32px; }
+        .slip { max-width: 720px; margin: 0 auto; border: 1px solid #333; padding: 32px; position: relative; overflow: hidden; }
         .header { text-align: center; border-bottom: 2px solid #111; padding-bottom: 12px; margin-bottom: 16px; }
         .header h1 { margin: 0 0 4px; font-size: 20px; }
         .header p { margin: 2px 0; font-size: 12px; color: #444; }
@@ -29,6 +29,8 @@
         .sign .ttd img { height: 80px; vertical-align: middle; }
         .toolbar { max-width: 720px; margin: 0 auto 16px; text-align: right; }
         .toolbar button { padding: 8px 20px; font-size: 14px; cursor: pointer; }
+        .watermark-lunas { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 5; }
+        .watermark-lunas span { font-size: 90px; font-weight: bold; letter-spacing: 12px; color: rgba(22, 163, 74, 0.16); border: 8px solid rgba(22, 163, 74, 0.25); border-radius: 12px; padding: 8px 32px; transform: rotate(-24deg); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         @media print {
             body { padding: 0; }
             .slip { border: none; padding: 0; max-width: none; }
@@ -41,6 +43,9 @@
     <button onclick="window.print()">Cetak Slip</button>
 </div>
 <div class="slip">
+    @if($isLunas ?? false)
+        <div class="watermark-lunas" aria-hidden="true"><span>LUNAS</span></div>
+    @endif
     <div class="header">
         <h1>{{ $settings->company_name }}</h1>
         @if($settings->company_address)<p>{{ $settings->company_address }}</p>@endif

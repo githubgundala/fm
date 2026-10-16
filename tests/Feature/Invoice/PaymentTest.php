@@ -134,6 +134,42 @@ it('redirects guests away from the payment slip', function (): void {
     get(route('payments.slip', $payment))->assertRedirect('/login');
 });
 
+it('shows the LUNAS watermark on the slip when the invoice is fully paid', function (): void {
+    $invoice = payableInvoice();
+    $payment = Payment::factory()->for($invoice, 'invoice')->create(['amount' => 300_000]);
+    app(PaymentRecorder::class)->record($invoice->refresh(), 700_000, 'cash');
+
+    get(route('payments.slip', $payment))
+        ->assertOk()
+        ->assertSee('<div class="watermark-lunas"', false)
+        ->assertSee('<span>LUNAS</span>', false);
+});
+
+it('hides the LUNAS watermark on the slip when a balance remains', function (): void {
+    $invoice = payableInvoice();
+    $payment = Payment::factory()->for($invoice, 'invoice')->create(['amount' => 300_000]);
+
+    get(route('payments.slip', $payment))
+        ->assertOk()
+        ->assertDontSee('<div class="watermark-lunas"', false);
+});
+
+it('reports paid-off only when the balance reaches zero', function (): void {
+    $invoice = payableInvoice();
+
+    expect($invoice->refresh()->isPaidOff())->toBeFalse();
+
+    app(PaymentRecorder::class)->record($invoice, 1_000_000, 'cash');
+
+    expect($invoice->refresh()->isPaidOff())->toBeTrue();
+});
+
+it('does not report an empty invoice as paid off', function (): void {
+    $invoice = Invoice::factory()->create(['status' => InvoiceStatus::Sent]);
+
+    expect($invoice->refresh()->isPaidOff())->toBeFalse();
+});
+
 it('notifies when the payment amount exceeds the balance', function (): void {
     $this->actingAs(superAdmin());
     $invoice = payableInvoice();

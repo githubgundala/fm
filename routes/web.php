@@ -21,6 +21,7 @@ Route::middleware(['auth'])->group(function () {
             'payment' => $payment,
             'invoice' => $payment->invoice,
             'settings' => $settings,
+            'isLunas' => $payment->invoice?->isPaidOff() ?? false,
             'signatureUrl' => $settings->signature_path && Storage::disk('public')->exists($settings->signature_path)
                 ? Storage::disk('public')->url($settings->signature_path)
                 : null,

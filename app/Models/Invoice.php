@@ -121,4 +121,20 @@ class Invoice extends Model
     {
         return in_array($this->status, [InvoiceStatus::Sent, InvoiceStatus::PartiallyPaid, InvoiceStatus::Overdue], true);
     }
+
+    /**
+     * Determine whether the invoice is fully paid (100% terbayar, sisa tagihan 0).
+     */
+    public function isPaidOff(): bool
+    {
+        if ($this->status === InvoiceStatus::Paid) {
+            return true;
+        }
+
+        if ((float) $this->grand_total <= 0) {
+            return false;
+        }
+
+        return (float) $this->amount_due <= 0.005;
+    }
 }

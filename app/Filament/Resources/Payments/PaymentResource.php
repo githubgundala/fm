@@ -56,6 +56,17 @@ class PaymentResource extends Resource
                             ->badge(),
                         Infolists\Components\TextEntry::make('invoice.invoice_number')
                             ->label('Invoice'),
+                        Infolists\Components\TextEntry::make('invoice.status')
+                            ->label('Status Tagihan')
+                            ->badge(),
+                        Infolists\Components\TextEntry::make('invoice.amount_due')
+                            ->label('Sisa Tagihan')
+                            ->money('IDR'),
+                        Infolists\Components\TextEntry::make('lunas')
+                            ->label('Pelunasan')
+                            ->badge()
+                            ->state(fn (Payment $record): string => ($record->invoice?->isPaidOff() ?? false) ? 'LUNAS' : 'Belum Lunas')
+                            ->color(fn (Payment $record): string => ($record->invoice?->isPaidOff() ?? false) ? 'success' : 'gray'),
                         Infolists\Components\TextEntry::make('reference')
                             ->label('Referensi')
                             ->placeholder('-'),
