@@ -50,6 +50,94 @@ it('creates an invoice with calculated totals', function (): void {
         ->and($invoice->items)->toHaveCount(2);
 });
 
+it('stores the IDR-formatted unit price as a clean number', function (): void {
+    $client = Client::factory()->create();
+
+    livewire(CreateInvoice::class)
+        ->assertSeeHtml("\$money(\$input, ',', '.', 0)")
+        ->fillForm([
+            'client_id' => $client->id,
+            'issue_date' => '2026-10-01',
+            'due_date' => '2026-10-15',
+            'items' => [
+                ['description' => 'Jasa A', 'qty' => 2, 'unit_price' => '1.500.000'],
+            ],
+            'discount_type' => null,
+            'discount_value' => 0,
+            'currency' => 'IDR',
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    $invoice = Invoice::where('client_id', $client->id)->first();
+
+    expect($invoice)->not->toBeNull()
+        ->and((float) $invoice->subtotal)->toBe(3000000.0)
+        ->and((float) $invoice->items->first()->unit_price)->toBe(1500000.0);
+});
+
+it('stores a fixed discount entered with IDR formatting', function (): void {
+    $client = Client::factory()->create();
+
+    livewire(CreateInvoice::class)
+        ->fillForm([
+            'client_id' => $client->id,
+            'issue_date' => '2026-10-01',
+            'due_date' => '2026-10-15',
+            'items' => [
+                ['description' => 'Jasa A', 'qty' => 1, 'unit_price' => '2.000.000'],
+            ],
+            'discount_type' => 'fixed',
+            'discount_value' => '500.000',
+            'currency' => 'IDR',
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    $invoice = Invoice::where('client_id', $client->id)->first();
+
+    expect($invoice)->not->toBeNull()
+        ->and((float) $invoice->discount_value)->toBe(500000.0)
+        ->and((float) $invoice->grand_total)->toBe(1500000.0);
+});
+
+it('stores a percentage discount without money grouping', function (): void {
+    $client = Client::factory()->create();
+
+    livewire(CreateInvoice::class)
+        ->fillForm([
+            'client_id' => $client->id,
+            'issue_date' => '2026-10-01',
+            'due_date' => '2026-10-15',
+            'items' => [
+                ['description' => 'Jasa A', 'qty' => 1, 'unit_price' => '2.000.000'],
+            ],
+            'discount_type' => 'percent',
+            'discount_value' => '12.5',
+            'currency' => 'IDR',
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    $invoice = Invoice::where('client_id', $client->id)->first();
+
+    expect($invoice)->not->toBeNull()
+        ->and((float) $invoice->discount_value)->toBe(12.5)
+        ->and((float) $invoice->grand_total)->toBe(1750000.0);
+});
+
+it('keeps the stored unit price intact when editing an invoice', function (): void {
+    $invoice = Invoice::factory()->create(['status' => InvoiceStatus::Draft]);
+    $item = InvoiceItem::factory()->for($invoice, 'invoice')->create(['qty' => 1, 'unit_price' => 1500000]);
+
+    livewire(EditInvoice::class, ['record' => $invoice->id])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect((float) $item->refresh()->unit_price)->toBe(1500000.0)
+        ->and((float) $invoice->refresh()->subtotal)->toBe(1500000.0);
+});
+
 it('rejects an invoice without items', function (): void {
     $client = Client::factory()->create();
 

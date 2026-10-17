@@ -3,6 +3,7 @@
 use App\Enums\InvoiceStatus;
 use App\Enums\PaymentMethod;
 use App\Filament\Resources\Payments\Pages\CreatePayment;
+use App\Filament\Resources\Payments\Pages\EditPayment;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\InvoiceSetting;
@@ -186,4 +187,35 @@ it('notifies when the payment amount exceeds the balance', function (): void {
         ->assertHasNoFormErrors();
 
     expect(Payment::count())->toBe(0);
+});
+
+it('stores the IDR-formatted amount as a clean number', function (): void {
+    $this->actingAs(superAdmin());
+    $invoice = payableInvoice();
+
+    livewire(CreatePayment::class)
+        ->assertSeeHtml("\$money(\$input, ',', '.', 0)")
+        ->fillForm([
+            'invoice_id' => $invoice->id,
+            'payment_date' => now()->format('Y-m-d'),
+            'amount' => '300.000',
+            'method' => PaymentMethod::Cash,
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    expect((float) Payment::query()->latest('id')->first()->amount)->toBe(300000.0);
+});
+
+it('keeps the stored amount intact when editing a payment', function (): void {
+    $this->actingAs(superAdmin());
+    $invoice = payableInvoice();
+    $payment = Payment::factory()->for($invoice, 'invoice')->create(['amount' => 300_000]);
+
+    livewire(EditPayment::class, ['record' => $payment->id])
+        ->assertSet('data.amount', 300000.0)
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect((float) $payment->refresh()->amount)->toBe(300000.0);
 });

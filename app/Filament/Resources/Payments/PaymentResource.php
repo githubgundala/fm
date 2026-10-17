@@ -78,6 +78,10 @@ class PaymentResource extends Resource
                         Infolists\Components\TextEntry::make('notes')
                             ->label('Catatan')
                             ->placeholder('-'),
+                        Infolists\Components\ImageEntry::make('proof_path')
+                            ->label('Bukti Pembayaran')
+                            ->disk('public')
+                            ->placeholder('-'),
                     ]),
             ]);
     }

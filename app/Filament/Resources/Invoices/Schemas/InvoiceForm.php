@@ -7,6 +7,8 @@ use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\InvoiceSetting;
 use App\Services\InvoiceNumberGenerator;
+use App\Support\MoneyInput;
+use App\Support\MoneyStateCast;
 use Closure;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
@@ -17,6 +19,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Filament\Support\RawJs;
 use Illuminate\Support\Carbon;
 
 class InvoiceForm
@@ -119,9 +122,14 @@ class InvoiceForm
                                 TextInput::make('unit_price')
                                     ->label('Harga Satuan')
                                     ->required()
-                                    ->numeric()
+                                    ->stateCast(new MoneyStateCast)
+                                    ->mask(MoneyInput::mask())
+                                    ->mutateStateForValidationUsing(fn (mixed $state): ?float => MoneyInput::toNumber($state))
+                                    ->rule('numeric')
                                     ->minValue(0)
+                                    ->inputMode('numeric')
                                     ->prefix('Rp')
+                                    ->helperText('Ketik angka saja, format ribuan otomatis.')
                                     ->live(onBlur: true),
                             ])
                             ->columns(4)
@@ -137,12 +145,21 @@ class InvoiceForm
                             ->label('Jenis Diskon')
                             ->options(DiscountType::class)
                             ->nullable()
+                            ->live()
                             ->disabled($isLocked),
                         TextInput::make('discount_value')
                             ->label('Nilai Diskon')
-                            ->numeric()
                             ->default(0)
+                            ->stateCast(fn (Get $get): MoneyStateCast => new MoneyStateCast(
+                                hasGrouping: ! self::discountIsPercent($get('discount_type')),
+                            ))
                             ->minValue(0)
+                            ->rule('numeric')
+                            ->inputMode('numeric')
+                            ->prefix(fn (Get $get): string => self::discountIsPercent($get('discount_type')) ? '%' : 'Rp')
+                            ->mask(fn (Get $get): ?RawJs => self::discountIsPercent($get('discount_type')) ? null : MoneyInput::mask())
+                            ->mutateStateForValidationUsing(fn (mixed $state, Get $get): ?float => self::discountIsPercent($get('discount_type')) ? MoneyInput::format($state) : MoneyInput::toNumber($state))
+                            ->helperText('Ikut jenis diskon: nominal (Rp) otomatis berformat ribuan, persen (%) tanpa format.')
                             ->disabled($isLocked),
                         TextInput::make('tax_rate')
                             ->label('Pajak (%) — opsional')
@@ -177,6 +194,16 @@ class InvoiceForm
                     ])
                     ->columns(2),
             ]);
+    }
+
+    /**
+     * Whether the given discount type (enum instance or string) is a percentage.
+     */
+    protected static function discountIsPercent(mixed $type): bool
+    {
+        return $type instanceof DiscountType
+            ? $type === DiscountType::Percent
+            : $type === DiscountType::Percent->value;
     }
 
     /**

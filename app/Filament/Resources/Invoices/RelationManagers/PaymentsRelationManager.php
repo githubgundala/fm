@@ -12,6 +12,7 @@ use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -58,6 +59,14 @@ class PaymentsRelationManager extends RelationManager
                 Textarea::make('notes')
                     ->label('Catatan')
                     ->columnSpanFull(),
+                FileUpload::make('proof_path')
+                    ->label('Bukti Pembayaran (opsional)')
+                    ->disk('public')
+                    ->directory('payment-proofs')
+                    ->visibility('public')
+                    ->image()
+                    ->maxSize(2048)
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -98,6 +107,7 @@ class PaymentsRelationManager extends RelationManager
                         $reference = $data['reference'] ?? null;
                         $notes = $data['notes'] ?? null;
                         $paymentNumber = $data['payment_number'] ?? null;
+                        $proofPath = $data['proof_path'] ?? null;
 
                         try {
                             app(PaymentRecorder::class)->record(
@@ -108,6 +118,7 @@ class PaymentsRelationManager extends RelationManager
                                 is_string($reference) ? $reference : null,
                                 is_string($notes) ? $notes : null,
                                 is_string($paymentNumber) ? $paymentNumber : null,
+                                is_string($proofPath) ? $proofPath : null,
                             );
                         } catch (ValidationException $exception) {
                             Notification::make()

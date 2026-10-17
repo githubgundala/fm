@@ -24,6 +24,7 @@ class PaymentRecorder
         ?string $reference = null,
         ?string $notes = null,
         ?string $paymentNumber = null,
+        ?string $proofPath = null,
     ): Payment {
         if (! $invoice->canReceivePayment()) {
             throw ValidationException::withMessages([
@@ -63,6 +64,7 @@ class PaymentRecorder
                 'method' => $methodValue,
                 'reference' => $reference,
                 'notes' => $notes,
+                'proof_path' => $proofPath,
                 'received_by' => auth()->id(),
             ])
         );

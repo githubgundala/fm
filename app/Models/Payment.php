@@ -20,11 +20,12 @@ use Illuminate\Support\Carbon;
  * @property PaymentMethod $method
  * @property string|null $reference
  * @property string|null $notes
+ * @property string|null $proof_path
  * @property int|null $received_by
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['payment_number', 'invoice_id', 'payment_date', 'amount', 'method', 'reference', 'notes', 'received_by'])]
+#[Fillable(['payment_number', 'invoice_id', 'payment_date', 'amount', 'method', 'reference', 'notes', 'proof_path', 'received_by'])]
 class Payment extends Model
 {
     /** @use HasFactory<PaymentFactory> */

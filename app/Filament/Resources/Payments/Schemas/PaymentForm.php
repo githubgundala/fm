@@ -6,7 +6,10 @@ use App\Enums\InvoiceStatus;
 use App\Enums\PaymentMethod;
 use App\Models\Invoice;
 use App\Services\InvoiceNumberGenerator;
+use App\Support\MoneyInput;
+use App\Support\MoneyStateCast;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -49,9 +52,14 @@ class PaymentForm
                         TextInput::make('amount')
                             ->label('Nominal')
                             ->required()
-                            ->numeric()
+                            ->stateCast(new MoneyStateCast)
+                            ->mask(MoneyInput::mask())
+                            ->mutateStateForValidationUsing(fn (mixed $state): ?float => MoneyInput::toNumber($state))
+                            ->rule('numeric')
                             ->minValue(0.01)
-                            ->prefix('Rp'),
+                            ->inputMode('numeric')
+                            ->prefix('Rp')
+                            ->helperText('Ketik angka saja, format ribuan otomatis. Contoh: 1.500.000'),
                         Select::make('method')
                             ->label('Metode')
                             ->options(PaymentMethod::class)
@@ -68,6 +76,15 @@ class PaymentForm
                         Textarea::make('notes')
                             ->label('Catatan')
                             ->helperText('Contoh: DP 30%.')
+                            ->columnSpanFull(),
+                        FileUpload::make('proof_path')
+                            ->label('Bukti Pembayaran (opsional)')
+                            ->disk('public')
+                            ->directory('payment-proofs')
+                            ->visibility('public')
+                            ->image()
+                            ->maxSize(2048)
+                            ->helperText('Foto struk / screenshot transfer. Maks 2MB. Boleh dikosongkan.')
                             ->columnSpanFull(),
                     ])
                     ->columns(2),
